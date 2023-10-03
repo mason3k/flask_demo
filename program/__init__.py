@@ -1,6 +1,17 @@
 import contextlib
 from flask import Flask
 import os
+from langid import langid
+
+langid.NORM_PROBS = True
+
+MODEL = langid.LanguageIdentifier.from_modelstring(langid.model, norm_probs=True)
+
+
+def normalize_probability(prob):
+    prob_exp = [0 if x == float("-inf") else math.exp(x) for x in prob]
+    prob_exp_sum = sum(prob_exp)
+    return prob_exp / prob_exp_sum
 
 
 def create_app(test_config=None):
@@ -35,5 +46,8 @@ def create_app(test_config=None):
     app.register_blueprint(auth.bp, url_prefix="/auth")
     app.register_blueprint(generator.bp)
     app.add_url_rule("/", endpoint="index")
+
+    # load langid model
+    langid.load_model()
 
     return app

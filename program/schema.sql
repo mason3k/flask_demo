@@ -7,11 +7,12 @@ CREATE TABLE user (
   password TEXT NOT NULL
 );
 
-CREATE TABLE post (
+CREATE TABLE entry (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   author_id INTEGER NOT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  title TEXT NOT NULL,
-  body TEXT NOT NULL,
+  text TEXT NOT NULL,
+  language TEXT NOT NULL,
+  certainty DECIMAL NOT NULL,
   FOREIGN KEY (author_id) REFERENCES user (id)
 );
