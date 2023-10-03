@@ -1,1 +1,1 @@
-FLASK_APP=demo.py
+FLASK_APP=program/__init__.py
