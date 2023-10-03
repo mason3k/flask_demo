@@ -10,6 +10,8 @@ build-backend = "setuptools.build_meta"
 
 dependencies = [
     "flask",
+    "langid",
+    "iso639-lang"
 ]
 
 [project.optional-dependencies]
