@@ -87,6 +87,24 @@ def update(id):
         return redirect(url_for("generator.index"))
 
 
+@bp.route("/search", methods=("GET", "POST"))
+@login_required
+def search():
+    search_t = request.form.get("search_url")
+    if search_t == "":
+        return render_template("index.html", error="Please enter a search term")
+    db = get_db()
+    entries = db.execute(
+        "SELECT p.id, text, language, certainty, created, author_id, username"
+        " FROM entry p JOIN user u ON p.author_id = u.id"
+        " WHERE text like ?"
+        " ORDER BY created DESC",
+        (f"%{search_t}%",),
+    ).fetchall()
+
+    return render_template("generator/search.html", entries=entries, search_tag=search_t)
+
+
 @bp.route("/<int:id>/delete", methods=("POST",))
 @login_required
 def delete(id):

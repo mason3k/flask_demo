@@ -8,18 +8,30 @@
 {% endblock %}
 
 {% block content %}
+{% if entries %}
+<div class="search_url_block">
+
+    <form method="post" action="/search" name="search_tag_block">
+        <input type="text" name="search_url" placeholder="Search tags ">
+        <button type="submit" class="button-primary search_url_btn" value="Search">Search</button>
+
+    </form>
+</div>
+{% endif %}
+
 {% for entry in entries %}
 <article class="text">
     <header>
         <div>
-            <h1>{{ entry['title'] }}</h1>
-            <div class="about">by {{ entry['username'] }} on {{ entry['created'].strftime('%Y-%m-%d') }}</div>
+            <h1>{{ entry['text']|truncate(10, end='...') }}</h1>
+            <div class="about">Searched on {{ entry['created'].strftime('%Y-%m-%d') }}</div>
         </div>
         {% if g.user['id'] == entry['author_id'] %}
         <a class="action" href="{{ url_for('generator.update', id=entry['id']) }}">Edit</a>
         {% endif %}
     </header>
-    <p class="body">{{ entry['text'] }} - {{ entry['language'] }} - {{ entry['certainty'] }}</p>
+    <p class="body">{{ entry['text'] }} - {{ entry['language'] }} - {{ '%0.2f' % (entry['certainty'] * 100) | float }}%
+    </p>
 </article>
 {% if not loop.last %}
 <hr>

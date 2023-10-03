@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Search{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class=" container search_header">
+    <h4>Search Results for : <b> {{ search_tag }} <b></h4>
+
+    <div style="overflow-x:auto;">
+        <div class="table_list u-full-width">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Text</th>
+                        <th>Language</th>
+                        <th>Certainty</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for entry in entries %}
+                    <tr>
+                        <td style="padding-left: 5px;">{{entry["text"]}}</td>
+                        <td style="text-align: center;">{{entry["language"]}}</td>
+                        <td id="info"><i class="material-icons">{{entry["certainty"]}}</i></a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
+{% endblock %}
