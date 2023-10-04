@@ -38,14 +38,10 @@ def create_app(test_config=None):
     # register db
     db.init_app(app)
 
-    # @app.route("/index")
-    # def index():
-    #     return "Hello, World!"
-
     # register blueprints
     app.register_blueprint(auth.bp, url_prefix="/auth")
     app.register_blueprint(generator.bp)
-    app.add_url_rule("/", endpoint="index")
+    app.add_url_rule("/", endpoint="index", view_func=generator.index)
 
     # load langid model
     langid.load_model()

@@ -10,7 +10,7 @@ from iso639 import Lang
 bp = Blueprint("generator", __name__)
 
 
-@bp.route("/")
+@bp.route("/index")
 def index():
     db = get_db()
     entries = db.execute(

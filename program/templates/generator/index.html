@@ -1,37 +1,54 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}Previous Results{% endblock %}</h1>
-{% if g.user %}
-<a class="action" href="{{ url_for('generator.create') }}">New</a>
-{% endif %}
 {% endblock %}
 
 {% block content %}
+<!-- Banner -->
+<section id="banner">
+    <div class="content">
+        <p>Language detector is a simple project for identifying the origin language for a text input
+            along with a probability score. Try it out!:</p>
+        <ul class="actions">
+            <li><a href="{{ url_for('generator.create') }}" class="button big">Detect</a></li>
+        </ul>
+    </div>
+    <span class="image object">
+        <img src="{{ url_for('static', filename='world.jpg') }}" alt="" />
+    </span>
+</section>
+<!-- Search Bar -->
 {% if entries %}
-<div class="search_url_block">
-
+<h1>Results</h1>
+<div class="search-box">
     <form method="post" action="/search" name="search_tag_block">
-        <input type="text" name="search_url" placeholder="Search tags ">
-        <button type="submit" class="button-primary search_url_btn" value="Search">Search</button>
-
+        <input type="text" name="search_url" placeholder="Search previous results ">
+        <!-- <button type="submit" class="button primary icon solid fa-search" value="Search">Search</button> -->
     </form>
 </div>
+
 {% endif %}
 
 {% for entry in entries %}
 <article class="text">
     <header>
-        <div>
-            <h1>{{ entry['text']|truncate(10, end='...') }}</h1>
-            <div class="about">Searched on {{ entry['created'].strftime('%Y-%m-%d') }}</div>
-        </div>
-        {% if g.user['id'] == entry['author_id'] %}
-        <a class="action" href="{{ url_for('generator.update', id=entry['id']) }}">Edit</a>
-        {% endif %}
+        <h3>{{ entry['text']|truncate(10, end='...') }}</h3>
     </header>
-    <p class="body">{{ entry['text'] }} - {{ entry['language'] }} - {{ '%0.2f' % (entry['certainty'] * 100) | float }}%
-    </p>
+    <table>
+        <tr>
+            <td>Text</td>
+            <td>Predicted Language</td>
+            <td>Confidence Score</td>
+        <tr>
+            <td>{{ entry['text'] }}</td>
+            <td>{{ entry['language'] }}</td>
+            <td>{{ '%0.2f' % (entry['certainty'] * 100) | float }}%</td>
+        </tr>
+    </table>
+    <div class="about">Searched on {{ entry['created'].strftime('%Y-%m-%d') }}</div>
+    {% if g.user['id'] == entry['author_id'] %}
+    <a class="action" href="{{ url_for('generator.update', id=entry['id']) }}">Edit</a>
+    {% endif %}
 </article>
 {% if not loop.last %}
 <hr>
