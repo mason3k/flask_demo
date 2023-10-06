@@ -1,23 +1,15 @@
 <!doctype html>
-<title>{% block title %}{% endblock %} - Language Detector</title>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700,900" rel="stylesheet">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" type="image/png" href="images/favicon.png">
 
-<!--
-	Editorial by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
+<html lang="en">
 
 <head>
-    <title>Language Detector</title>
+    <!-- Title -->
+    <title>{% block title %}{% endblock %} - Language Detector</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <!-- <link rel="stylesheet" href="assets/css/main.css" /> -->
+    <!-- Stylesheets -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
 
 <body class="is-preload">
@@ -33,6 +25,8 @@
                 <header id="header">
                     <a href="index" class="logo"><strong>Language Detector</strong> a simple language
                         identifier</a>
+
+                    <!-- Login -->
                     <ul class="icons">
                         {% if g.user %}
                         <li><span>{{ g.user['username'] }}</span>
@@ -44,12 +38,23 @@
                     </ul>
                 </header>
 
+                <!-- Content -->
                 <section class="content">
                     <header>
                         {% block header %}{% endblock %}
                     </header>
+
+                    <!-- Flashed messages -->
                     {% for message in get_flashed_messages() %}
                     <div class="flash">{{ message }}</div>
                     {% endfor %}
+
+                    <!-- Content -->
                     {% block content %}{% endblock %}
                 </section>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

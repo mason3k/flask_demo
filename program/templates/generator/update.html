@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}Update{% endblock %}
+
 {% block header %}
 <h1>{% block title %}Edit "{{ entry['text'] | truncate(10, end='...' )}}"{% endblock %}</h1>
 {% endblock %}

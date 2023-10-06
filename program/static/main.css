@@ -1938,9 +1938,11 @@ textarea {
     color: inherit;
     display: block;
     outline: 0;
-    padding: 0 1em;
+    padding: 1em;
     text-decoration: none;
     width: 100%;
+    margin-top: .75rem;
+    margin-bottom: .75rem;
 }
 
 input[type="text"]:invalid,
@@ -2591,6 +2593,8 @@ button,
     text-decoration: none;
     text-transform: uppercase;
     white-space: nowrap;
+    margin-top: .75rem;
+    margin-bottom: .75rem;
 }
 
 input[type="submit"]:hover,
