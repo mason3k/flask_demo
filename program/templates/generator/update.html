@@ -3,12 +3,12 @@
 {% block title %}Update{% endblock %}
 
 {% block header %}
-<h1>{% block title %}Edit "{{ entry['text'] | truncate(10, end='...' )}}"{% endblock %}</h1>
+<h1>Edit "{{ entry['text'] | truncate(10, end='...' )}}"</h1>
 {% endblock %}
 
 {% block content %}
 <form method="post">
-    <label for="title">Text</label>
+    <!-- <label for="title">Text</label> -->
     <input name="text" id="text" value="{{ request.form['text'] or entry['text'] }}" required>
     <input type="submit" value="Save">
 </form>
