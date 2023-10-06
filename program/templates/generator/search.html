@@ -3,7 +3,7 @@
 {% block title %}Search{% endblock %}
 
 {% block header %}
-<h1>{% block title %}Search{% endblock %}</h1>
+<h1>Search</h1>
 {% endblock %}
 
 {% block content %}
@@ -25,9 +25,9 @@
                 <tbody>
                     {% for entry in entries %}
                     <tr>
-                        <td style="padding-left: 5px;">{{entry["text"]}}</td>
-                        <td style="text-align: center;">{{entry["language"]}}</td>
-                        <td id="info"><i class="material-icons">{{entry["certainty"]}}</i></a></td>
+                        <td>{{entry["text"]}}</td>
+                        <td>{{entry["language"]}}</td>
+                        <td>{{ '%0.2f' % (entry['certainty'] * 100) | float }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -35,7 +35,7 @@
         </div>
     </div>
 </div>
-</body>
 
-</html>
+<a class="button" href="{{ url_for('generator.index') }}">Back</a>
+
 {% endblock %}
