@@ -285,7 +285,8 @@ p {
 h1,
 h2,
 h3 {
-    font-weight: 1000
+    font-weight: 1000;
+    color: #f56a6a
 }
 
 h4,
@@ -2501,7 +2502,7 @@ ul.pagination li:last-child {
 }
 
 table {
-    margin: 0 0 2em 0;
+    margin: 0 0 0 0;
     width: 100%;
 }
 
@@ -3677,4 +3678,14 @@ button:disabled,
     display: flex;
     align-items: center;
     justify-self: right;
+}
+
+a.edit {
+    margin: 5px;
+}
+
+div.about {
+    text-align: right;
+    font-size: smaller;
+
 }

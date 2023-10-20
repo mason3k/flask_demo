@@ -25,18 +25,19 @@
 {% if entries %}
 <h1>Results</h1>
 <div class="row">
-    <div class="col-10 col-12-medium">
+    <div class="col-10 col-12-small">
         <form method="post" action="/search" name="search_tag_block">
             <input type="text" name="search_url" placeholder="Search previous results ">
         </form>
     </div>
-    <div class="col-2 col-12-medium">
-        <a href="{{ url_for('generator.create') }}" class="button">New Entry</a>
+    <div class="col-2 col-12-small">
+        <a href="{{ url_for('generator.create') }}" class="button fit">New Entry</a>
     </div>
 </div>
 {% endif %}
 
 {% for entry in entries %}
+<div class="box">
 <article class="text">
     <header>
         <h3>{{ entry['text']|truncate(10, end='...') }}</h3>
@@ -52,13 +53,15 @@
             <td>{{ '%0.2f' % (entry['certainty'] * 100) | float }}%</td>
         </tr>
     </table>
-    <div class="about">Searched on {{ entry['created'].strftime('%Y-%m-%d') }}</div>
+    <div class="about">Searched on {{ entry['created'].strftime('%Y-%m-%d') }}
     {% if g.user['id'] == entry['author_id'] %}
-    <a class="action" href="{{ url_for('generator.update', id=entry['id']) }}">Edit</a>
+    <a class="action edit" href="{{ url_for('generator.update', id=entry['id']) }}">Edit</a>
     {% endif %}
+    </div>
 </article>
+</div>
 {% if not loop.last %}
-<hr>
+<!-- <hr> -->
 {% endif %}
 {% endfor %}
 {% endblock %}
