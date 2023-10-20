@@ -18,7 +18,7 @@
                         <th>Text</th>
                         <th>Language</th>
                         <th>Certainty</th>
-
+                        <th>Searched</th>
                     </tr>
                 </thead>
 
@@ -28,6 +28,7 @@
                         <td>{{entry["text"]}}</td>
                         <td>{{entry["language"]}}</td>
                         <td>{{ '%0.2f' % (entry['certainty'] * 100) | float }}%</td>
+                        <td>{{entry['created'].strftime('%Y-%m-%d')}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
