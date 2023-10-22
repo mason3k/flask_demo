@@ -22,7 +22,7 @@
 </section>
 
 <!-- Search Bar -->
-{% if entries %}
+{% if entries and  g.user %}%
 <h2>Previous Results</h2>
 <div class="row">
     <div class="col-10 col-12-small">
@@ -34,7 +34,6 @@
         <a href="{{ url_for('generator.create') }}" class="button fit">New Entry</a>
     </div>
 </div>
-{% endif %}
 
 {% for entry in entries %}
 <div class="box">
@@ -61,7 +60,7 @@
 </article>
 </div>
 {% if not loop.last %}
-<!-- <hr> -->
 {% endif %}
 {% endfor %}
+{% endif %}
 {% endblock %}
