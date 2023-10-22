@@ -84,7 +84,7 @@ def update(id):
             "UPDATE entry SET text = ?, language = ?, certainty = ?" " WHERE id = ?", (text, language, certainty, id)
         )
         db.commit()
-        return redirect(url_for("generator.index"))
+        return render_template("generator/result.html", text=text, language=language, certainty=certainty)
 
 
 @bp.route("/search", methods=("GET", "POST"))

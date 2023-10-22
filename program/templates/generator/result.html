@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Search{% endblock %}
+
+{% block header %}
+<h2>Result</h2>
+{% endblock %}
+
+{% block content %}
+<article class="text">
+    <header>
+        <h3>{{ text|truncate(10, end='...') }}</h3>
+    </header>
+    <table>
+        <tr>
+            <td>Text</td>
+            <td>Predicted Language</td>
+            <td>Confidence Score</td>
+        <tr>
+            <td>{{ text }}</td>
+            <td>{{ language }}</td>
+            <td>{{ '%0.2f' % (certainty * 100) | float }}%</td>
+        </tr>
+    </table>
+</article>
+<a class="button" href="{{ url_for('index') }}"> <i class="fa-solid fa-house"></i> Home</a>
+{% endblock %}
