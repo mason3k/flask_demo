@@ -1,11 +1,11 @@
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for
+from iso639 import Lang
 from werkzeug.exceptions import abort
 
 from program.auth import login_required
 from program.db import get_db
-from langid.langid import classify
+
 from . import MODEL
-from iso639 import Lang
 
 bp = Blueprint("generator", __name__)
 
@@ -38,7 +38,7 @@ def create():
                 (text, language, certainty, g.user["id"]),
             )
             db.commit()
-            return redirect(url_for("generator.index"))
+            return render_template("generator/result.html", text=text, language=language, certainty=certainty)
 
     return render_template("generator/create.html")
 
