@@ -3,17 +3,16 @@
 {% block title %}Update{% endblock %}
 
 {% block header %}
-<h1>Edit "{{ entry['text'] | truncate(10, end='...' )}}"</h1>
+<h2>Edit "{{ entry['text'] | truncate(10, end='...' )}}"</h2>
 {% endblock %}
 
 {% block content %}
-<form method="post">
-    <!-- <label for="title">Text</label> -->
-    <input name="text" id="text" value="{{ request.form['text'] or entry['text'] }}" required>
-    <input type="submit" value="Save">
-</form>
-<hr>
-<form action="{{ url_for('generator.delete', id=entry['id']) }}" method="post">
-    <input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
-</form>
+<div class="col-12">
+    <form method="post">
+        <textarea name="text" id="input" rows="3">{{ request.form['text'] or entry['text'] }}
+        </textarea>
+        <input class="button" type="submit" value="Save">
+        <input class="button primary" type="submit" value="Delete Entry" onclick="return confirm('Are you sure?');">
+    </form>
+</div>
 {% endblock %}
