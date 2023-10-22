@@ -2087,7 +2087,7 @@ input[type="radio"]+label:before {
     border-radius: 100%;
 }
 
-input.button+input.button {
+button+button {
     margin: 10px;
 }
 

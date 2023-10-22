@@ -8,11 +8,15 @@
 
 {% block content %}
 <div class="col-12">
-    <form method="post">
+    <form method="post" id="update_entry">
         <textarea name="text" id="input" rows="3">{{ request.form['text'] or entry['text'] }}
         </textarea>
-        <input class="button" type="submit" value="Save">
-        <input class="button primary" type="submit" value="Delete Entry" onclick="return confirm('Are you sure?');">
     </form>
+    <form action="{{ url_for('generator.delete', id=entry['id']) }}" method="post" id="delete_entry">
+    </form>
+    <div>
+        <button class="button" type="submit" form="update_entry">Save</button>
+        <button class="button primary" type="submit" form="delete_entry"><i class="fa-solid fa-trash"></i> Delete</button>
+    </div>
 </div>
 {% endblock %}
