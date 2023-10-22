@@ -3,22 +3,22 @@
 {% block title %}Search{% endblock %}
 
 {% block header %}
-<h1>Search</h1>
+<h2>Search</h2>
 {% endblock %}
 
 {% block content %}
-<div class=" container search_header">
-    <h4>Search Results for : <b> {{ search_tag }} <b></h4>
+<div>
+    <h4>Search Results for : <b> {{ search_tag }} </b></h4>
 
-    <div style="overflow-x:auto;">
-        <div class="table_list u-full-width">
+    <div>
+        <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
                         <th>Text</th>
                         <th>Language</th>
                         <th>Certainty</th>
-
+                        <th>Searched</th>
                     </tr>
                 </thead>
 
@@ -28,6 +28,7 @@
                         <td>{{entry["text"]}}</td>
                         <td>{{entry["language"]}}</td>
                         <td>{{ '%0.2f' % (entry['certainty'] * 100) | float }}%</td>
+                        <td>{{entry['created'].strftime('%b %d %Y, %I:%M%p')}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

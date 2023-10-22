@@ -3,11 +3,6 @@ name = "flaskr"
 version = "1.0.0"
 description = "A basic web app for detecting text languages."
 
-
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
 dependencies = [
     "flask",
     "langid",
@@ -18,4 +13,14 @@ dependencies = [
 dev = [
   "python-dotenv == 1.0.0"
 ]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+python_requires = ">= 3.11"
+
+[tool.setuptools]
+packages = ["program"]
+
+
 
