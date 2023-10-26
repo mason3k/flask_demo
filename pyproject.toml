@@ -6,13 +6,10 @@ description = "A basic web app for detecting text languages."
 dependencies = [
     "flask",
     "langid",
-    "iso639-lang"
+    "iso639-lang",
+    "python-dotenv == 1.0.0"
 ]
 
-[project.optional-dependencies]
-dev = [
-  "python-dotenv == 1.0.0"
-]
 
 [build-system]
 requires = ["setuptools>=61.0"]
