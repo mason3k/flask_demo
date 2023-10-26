@@ -1,12 +1,12 @@
 import contextlib
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask
 from langid import langid
 
 load_dotenv()
-langid.NORM_PROBS = True
 
 MODEL = langid.LanguageIdentifier.from_modelstring(langid.model, norm_probs=True)
 
@@ -34,7 +34,7 @@ def create_app(test_config=None):
 
     # ensure the instance folder exists
     with contextlib.suppress(OSError):
-        os.makedirs(app.instance_path, exist_ok=True)
+        Path(app.instance_path).mkdir(parents=True, exist_ok=True)
 
     from . import auth, db, generator
 
