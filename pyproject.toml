@@ -19,5 +19,7 @@ python_requires = ">= 3.11"
 [tool.setuptools]
 packages = ["program"]
 
+[tool.bandit]
+exclude_dirs = ["tests"]
 
 

@@ -1,0 +1,31 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+# NOTE: to change install location update the directory PRE_COMMIT_HOME environment variable
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: trailing-whitespace
+      -   id: requirements-txt-fixer
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.3.1
+    hooks:
+      - id: pyupgrade
+        args: [--py311-plus]
+  - repo: https://github.com/hadialqattan/pycln
+    rev: v2.1.2 # Possible releases: https://github.com/hadialqattan/pycln/releases
+    hooks:
+      - id: pycln
+        args: [--config=pyproject.toml, -ee, __init__]
+  - repo: https://github.com/dosisod/refurb
+    rev: v1.10.0
+    hooks:
+      - id: refurb
+  -   repo: https://github.com/PyCQA/bandit
+      rev: 1.7.5
+      hooks:
+        - id: bandit
+          args: ["-c", "pyproject.toml"]
