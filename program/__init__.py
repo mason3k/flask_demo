@@ -1,8 +1,11 @@
 import contextlib
-from flask import Flask
 import os
+
+from dotenv import load_dotenv
+from flask import Flask
 from langid import langid
 
+load_dotenv()
 langid.NORM_PROBS = True
 
 MODEL = langid.LanguageIdentifier.from_modelstring(langid.model, norm_probs=True)
@@ -18,7 +21,7 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY="dev",
+        SECRET_KEY=os.environ["SECRET_KEY"],
         DATABASE=os.path.join(app.instance_path, "program.sqlite"),
     )
 
@@ -33,7 +36,7 @@ def create_app(test_config=None):
     with contextlib.suppress(OSError):
         os.makedirs(app.instance_path, exist_ok=True)
 
-    from . import db, auth, generator
+    from . import auth, db, generator
 
     # register db
     db.init_app(app)
