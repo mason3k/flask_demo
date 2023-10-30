@@ -9,7 +9,9 @@ repos:
       - id: check-toml
       - id: check-json
       - id: trailing-whitespace
-      -   id: requirements-txt-fixer
+      - id: requirements-txt-fixer
+      - id: check-merge-conflict
+      - id: pretty-format-json
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.3.1
     hooks:
