@@ -7,12 +7,13 @@ from iso639 import Lang
 from werkzeug.exceptions import abort
 
 from program.auth import login_required
+from program.config import Config
 from program.db import get_db
 
 from . import MODEL
 
-bp = Blueprint("generator", __name__)
 KEY = os.environ["DETECTOR_API_KEY"]
+bp = Blueprint("generator", __name__)
 
 
 @dataclass(frozen=True)
@@ -23,13 +24,23 @@ class LangResult:
 
 @bp.route("/index")
 def index():
+    rpp = Config.ROWS_PER_PAGE
+    page = request.args.get("page", 1, type=int)
     db = get_db()
     entries = db.execute(
-        "SELECT p.id, text, language, certainty, created, author_id, username"
+        "SELECT p.id, text, language, certainty, created, author_id, username,"
+        " COUNT() OVER() AS total_entries"
         " FROM entry p JOIN user u ON p.author_id = u.id"
         " ORDER BY created DESC"
+        f" LIMIT {rpp} OFFSET {(page - 1)  * rpp}"
     ).fetchall()
-    return render_template("generator/index.html", entries=entries)
+    max_page = entries[0]["total_entries"] // rpp if entries else 0
+    return render_template(
+        "generator/index.html",
+        entries=entries,
+        active_page=page,
+        max_page=max_page,
+    )
 
 
 def detect_language(text: str, offline_mode: bool = False) -> LangResult:
@@ -79,7 +90,7 @@ def create():
                     certainty=result.certainty,
                 )
 
-    return render_template("generator/create.html")
+    return render_template("generator/create.html", default_mode=Config.DEFAULT_MODE)
 
 
 def get_entry(id, check_author=True):
