@@ -1,3 +1,7 @@
+import os
+from dataclasses import dataclass
+
+import httpx
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 from iso639 import Lang
 from werkzeug.exceptions import abort
@@ -8,6 +12,13 @@ from program.db import get_db
 from . import MODEL
 
 bp = Blueprint("generator", __name__)
+KEY = os.environ["DETECTOR_API_KEY"]
+
+
+@dataclass(frozen=True)
+class LangResult:
+    language: str
+    certainty: float
 
 
 @bp.route("/index")
@@ -21,24 +32,52 @@ def index():
     return render_template("generator/index.html", entries=entries)
 
 
+def detect_language(text: str, offline_mode: bool = False) -> LangResult:
+    if offline_mode:
+        language, certainty = MODEL.classify(text)
+    else:
+        r = httpx.post(
+            "https://ws.detectlanguage.com/0.2/detect",
+            headers={"Authorization": f"Bearer {KEY}"},
+            json={"q": text},
+        )
+        r.raise_for_status()
+        result = r.json()["data"]["detections"][0]
+        language, certainty = (
+            result["language"],
+            min((result["confidence"] / 10), 100),
+        )
+    return LangResult(Lang(language).name, certainty)
+
+
 @bp.route("/create", methods=("GET", "POST"))
 @login_required
 def create():
     if request.method == "POST":
         text = request.form["text"]
+        offline = request.form.get("offline-mode", 0)
         error = None if text else "Text is required."
         if error is not None:
             flash(error)
         else:
             db = get_db()
-            language, certainty = MODEL.classify(text)
-            language = Lang(language).name
-            db.execute(
-                "INSERT INTO entry (text, language, certainty, author_id)" " VALUES (?, ?, ?, ?)",
-                (text, language, certainty, g.user["id"]),
-            )
-            db.commit()
-            return render_template("generator/result.html", text=text, language=language, certainty=certainty)
+            try:
+                result = detect_language(text, offline_mode=bool(offline))
+            except Exception as e:
+                flash(f"Problem detecting language: {e}")
+            else:
+                db.execute(
+                    "INSERT INTO entry (text, language, certainty, offline, author_id)"
+                    " VALUES (?, ?, ?, ?, ?)",
+                    (text, result.language, result.certainty, "1", g.user["id"]),
+                )
+                db.commit()
+                return render_template(
+                    "generator/result.html",
+                    text=text,
+                    language=result.language,
+                    certainty=result.certainty,
+                )
 
     return render_template("generator/create.html")
 
@@ -47,7 +86,7 @@ def get_entry(id, check_author=True):
     entry = (
         get_db()
         .execute(
-            "SELECT p.id, text, language, certainty, created, author_id, username"
+            "SELECT p.id, text, language, certainty, created, offline, author_id, username"
             " FROM entry p JOIN user u ON p.author_id = u.id"
             " WHERE p.id = ?",
             (id,),
@@ -72,19 +111,29 @@ def update(id):
         return render_template("generator/update.html", entry=entry)
 
     text = request.form["text"]
+    offline = request.form.get("offline-mode", 0)
     error = None if text else "Text is required."
     if error is not None:
         flash(error)
     else:
         db = get_db()
-        text = request.form["text"]
-        language, certainty = MODEL.classify(text)
-        language = Lang(language).name
-        db.execute(
-            "UPDATE entry SET text = ?, language = ?, certainty = ?" " WHERE id = ?", (text, language, certainty, id)
-        )
-        db.commit()
-        return render_template("generator/result.html", text=text, language=language, certainty=certainty)
+        try:
+            result = detect_language(text, offline_mode=bool(offline))
+        except Exception as e:
+            flash(f"Problem detecting language: {e}")
+        else:
+            db.execute(
+                "UPDATE entry SET text = ?, language = ?, certainty = ?, offline = ?"
+                " WHERE id = ?",
+                (text, result.language, result.certainty, offline, id),
+            )
+            db.commit()
+            return render_template(
+                "generator/result.html",
+                text=text,
+                language=result.language,
+                certainty=result.certainty,
+            )
 
 
 @bp.route("/search", methods=("GET", "POST"))
@@ -102,7 +151,9 @@ def search():
         (f"%{search_t}%",),
     ).fetchall()
 
-    return render_template("generator/search.html", entries=entries, search_tag=search_t)
+    return render_template(
+        "generator/search.html", entries=entries, search_tag=search_t
+    )
 
 
 @bp.route("/<int:id>/delete", methods=("POST",))

@@ -9,14 +9,34 @@
 {% block content %}
 <div class="col-12">
     <form method="post" id="update_entry">
+        <div class="align-right">
+            <input type="checkbox" id="offline-mode" name="offline-mode" value=1 {{'checked' if entry['offline'] else ''}}>
+            <label class="offline-mode" for="offline-mode">Offline mode</label>
+        </div>
         <textarea name="text" id="input" rows="3">{{ request.form['text'] or entry['text'] }}
         </textarea>
     </form>
     <form action="{{ url_for('generator.delete', id=entry['id']) }}" method="post" id="delete_entry">
     </form>
-    <div>
-        <button class="button" type="submit" form="update_entry">Save</button>
-        <button class="button primary" type="submit" form="delete_entry"><i class="fa-solid fa-trash"></i> Delete</button>
+    <!-- <form method="post" id="update_entry">
+        <input type="checkbox" id="offline-mode" name="offline-mode" value=1 {{'checked' if entry['offline'] else ''}}>
+        <label class="offline-mode" for="offline-mode">Offline mode</label>
+    </form> -->
+    <div class="row">
+        <div class="col-10 col-12-small">
+            <button class="button" type="submit" form="update_entry">Save</button>
+            <button class="button primary" type="submit" form="delete_entry"><i class="fa-solid fa-trash"></i> Delete</button>
+        </div>
+        <div class="col-2 col-12-small offline-mode">
+            <!-- <input type="checkbox" id="offline-mode" name="offline-mode" value=1 form="update_entry" {{'checked' if entry['offline'] else ''}}> -->
+
+            <!-- <input type="checkbox" id="offline-mode" name="offline-mode" value="1"> -->
+            <!-- <form method="post" id="offline-mode">
+                <input type="checkbox" id="offline-mode" name="offline-mode" value=1 {{'checked' if entry['offline'] else ''}}>
+                <label class="offline-mode" for="offline-mode">Offline mode</label>
+            </form> -->
+        </div>
     </div>
 </div>
+
 {% endblock %}

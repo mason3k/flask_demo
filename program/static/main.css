@@ -1910,7 +1910,8 @@ header.main> :last-child {
 
 /* Form */
 form {
-    margin: 0 0 2em 0;
+    margin: 0 0 0 0;
+    /* margin: 0 0 2em 0; */
 }
 
 label {
@@ -3701,4 +3702,14 @@ div.about {
     text-align: right;
     font-size: smaller;
 
+}
+
+div.offline-mode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+label.offline-mode {
+    margin-bottom: 0px;
 }

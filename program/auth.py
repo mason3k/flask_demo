@@ -1,6 +1,15 @@
 import functools
 
-from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from program.db import get_db
@@ -38,7 +47,7 @@ def register():
         except db.IntegrityError:
             error = f"User {username} is already registered."
         else:
-            return redirect(url_for("auth.login"))
+            return redirect(url_for("index"))
 
         flash(error)
 
@@ -51,7 +60,9 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         db = get_db()
-        user = db.execute("SELECT * FROM user WHERE username = ?", (username,)).fetchone()
+        user = db.execute(
+            "SELECT * FROM user WHERE username = ?", (username,)
+        ).fetchone()
         error = None
 
         try:
@@ -78,7 +89,9 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = get_db().execute("SELECT * FROM user WHERE id = ?", (user_id,)).fetchone()
+        g.user = (
+            get_db().execute("SELECT * FROM user WHERE id = ?", (user_id,)).fetchone()
+        )
 
 
 @bp.route("/logout")

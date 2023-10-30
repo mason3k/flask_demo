@@ -14,5 +14,6 @@ CREATE TABLE entry (
   text TEXT NOT NULL,
   language TEXT NOT NULL,
   certainty DECIMAL NOT NULL,
+  offline INTEGER NOT NULL,
   FOREIGN KEY (author_id) REFERENCES user (id)
 );
