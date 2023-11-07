@@ -8,7 +8,9 @@ dependencies = [
     "langid",
     "iso639-lang",
     "python-dotenv",
-    "httpx"
+    "httpx",
+    "SQLAlchemy",
+    "Flask-SQLAlchemy"
 ]
 
 
