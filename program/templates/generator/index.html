@@ -22,7 +22,7 @@
 </section>
 
 <!-- Search Bar -->
-{% if entries and  g.user %}
+{% if page.items and  g.user %}
 <h2>Previous Results</h2>
 <div class="row">
     <div class="col-10 col-12-small">
@@ -35,7 +35,7 @@
     </div>
 </div>
 
-{% for entry in entries %}
+{% for entry in page.items %}
 <div class="box">
 <article class="text">
     <header>
@@ -62,15 +62,17 @@
 {% if not loop.last %}
 {% endif %}
 {% endfor %}
-{% if max_page > 1 %}
+{% if page.total > 1 %}
 <ul class="pagination">
-    <li><a href="{{ url_for('generator.index', page=active_page - 1) }}" class="button {{'disabled' if active_page == 1 else ''}}">Prev</a></li>
-    {% for page in range(1, max_page + 1) %}
-    <li><a href="{{ url_for('generator.index', page=page) }}" class="page {{'active' if active_page == page else ''}}">{{page}}</a></li>
-     <!-- TODO: handle large number of rows -->
-    <!-- <li><span>&hellip;</span></li> -->
+    <li><a href="{{ url_for('generator.index', page=page.prev()) }}" class="button {{'disabled' if not page.has_prev else ''}}">Prev</a></li>
+    {% for p in page.iter_pages() %}
+        {% if p %}
+            <li><a href="{{ url_for('generator.index', page=p) }}" class="page {{'active' if page.page == p else ''}}">{{p}}</a></li>
+        {% else %}
+            <li><span>&hellip;</span></li>
+        {% endif %}
     {% endfor %}
-    <li><a href="{{ url_for('generator.index', page=active_page + 1) }}" class="button {{'disabled' if active_page == max_page else ''}}"">Next</a></li>
+    <li><a href="{{ url_for('generator.index', page=page.next()) }}" class="button {{'disabled' if not page.has_next else ''}}"">Next</a></li>
 </ul>
 {% endif %}
 {% endif %}
