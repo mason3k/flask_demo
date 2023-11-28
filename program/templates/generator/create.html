@@ -14,7 +14,7 @@
             <input type="submit" value="Submit" class="primary" /></li>
         </div>
         <div class="col-2 col-12-small offline-mode">
-            <input type="checkbox" id="offline-mode" name="offline-mode" value=1 checked>
+            <input type="checkbox" id="offline-mode" name="offline-mode" value=1 {{'checked' if default_mode == 'offline' else ''}}>
             <label class="offline-mode" for="offline-mode">Offline mode</label>
         </div>
     </div>

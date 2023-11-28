@@ -2,20 +2,24 @@
 name = "flaskr"
 version = "1.0.0"
 description = "A basic web app for detecting text languages."
+requires-python = ">= 3.10"
 
 dependencies = [
     "flask",
     "langid",
     "iso639-lang",
     "python-dotenv",
-    "httpx"
+    "httpx",
+    "SQLAlchemy",
+    "Flask-SQLAlchemy",
+    "flask-security-too",
+    "bcrypt"
 ]
 
 
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
-python_requires = ">= 3.11"
 
 [tool.setuptools]
 packages = ["program"]
