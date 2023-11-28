@@ -13,7 +13,8 @@ dependencies = [
     "SQLAlchemy",
     "Flask-SQLAlchemy",
     "flask-security-too",
-    "bcrypt"
+    "bcrypt",
+    "Flask-Mail"
 ]
 
 
