@@ -2,17 +2,30 @@ import os
 from dataclasses import dataclass
 
 import httpx
-from flask import Blueprint, flash, g, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_security import auth_required, current_user
 from iso639 import Lang
+from sqlalchemy import false, select
 from werkzeug.exceptions import abort
 
 from program.auth import login_required
-from program.db import get_db
+from program.config import Config
 
+# from program.db import get_db
 from . import MODEL
+from .db import db
+from .models import Entry, User
 
-bp = Blueprint("generator", __name__)
 KEY = os.environ["DETECTOR_API_KEY"]
+bp = Blueprint("generator", __name__)
 
 
 @dataclass(frozen=True)
@@ -22,14 +35,22 @@ class LangResult:
 
 
 @bp.route("/index")
+@auth_required()
 def index():
-    db = get_db()
-    entries = db.execute(
-        "SELECT p.id, text, language, certainty, created, author_id, username"
-        " FROM entry p JOIN user u ON p.author_id = u.id"
-        " ORDER BY created DESC"
-    ).fetchall()
-    return render_template("generator/index.html", entries=entries)
+    # db.session.add(User(email="test1@me.com", password="hi", active=True, fs_uniquifier=uuid.uuid4().hex))
+    # raise Exception(db.session.query(User).filter_by(email="test@me.com").first())
+    # raise Exception([user for user in db.session.execute(select(User)).scalars()])
+    rpp = Config.ROWS_PER_PAGE
+    page_num = request.args.get("page", 1, type=int)
+    if g.user:
+        s = select(Entry).where(Entry.author_id == g.user.id).order_by(Entry.created.desc())
+    else:
+        s = select(Entry).filter(false())
+    page = db.paginate(s, page=page_num, per_page=rpp)
+    return render_template(
+        "generator/index.html",
+        page=page,
+    )
 
 
 def detect_language(text: str, offline_mode: bool = False) -> LangResult:
@@ -55,23 +76,27 @@ def detect_language(text: str, offline_mode: bool = False) -> LangResult:
 def create():
     if request.method == "POST":
         text = request.form["text"]
-        offline = request.form.get("offline-mode", 0)
         error = None if text else "Text is required."
         if error is not None:
             flash(error)
         else:
-            db = get_db()
+            offline = bool(request.form.get("offline-mode", 0))
             try:
-                result = detect_language(text, offline_mode=bool(offline))
+                result = detect_language(text, offline_mode=offline)
             except Exception as e:
                 flash(f"Problem detecting language: {e}")
             else:
-                db.execute(
-                    "INSERT INTO entry (text, language, certainty, offline, author_id)"
-                    " VALUES (?, ?, ?, ?, ?)",
-                    (text, result.language, result.certainty, "1", g.user["id"]),
+                db.session.add(
+                    Entry(
+                        text=text,
+                        language=result.language,
+                        certainty=result.certainty,
+                        offline=offline,
+                        author_id=g.user.id,
+                    )
                 )
-                db.commit()
+                db.session.commit()
+
                 return render_template(
                     "generator/result.html",
                     text=text,
@@ -79,25 +104,13 @@ def create():
                     certainty=result.certainty,
                 )
 
-    return render_template("generator/create.html")
+    return render_template("generator/create.html", default_mode=Config.DEFAULT_MODE)
 
 
 def get_entry(id, check_author=True):
-    entry = (
-        get_db()
-        .execute(
-            "SELECT p.id, text, language, certainty, created, offline, author_id, username"
-            " FROM entry p JOIN user u ON p.author_id = u.id"
-            " WHERE p.id = ?",
-            (id,),
-        )
-        .fetchone()
-    )
+    entry = db.one_or_404(db.select(Entry).filter_by(id=id), description=f"Entry id {id} doesn't exist.")
 
-    if entry is None:
-        abort(404, f"Entry id {id} doesn't exist.")
-
-    if check_author and entry["author_id"] != g.user["id"]:
+    if check_author and entry.author_id != g.user.id:
         abort(403)
 
     return entry
@@ -111,23 +124,23 @@ def update(id):
         return render_template("generator/update.html", entry=entry)
 
     text = request.form["text"]
-    offline = request.form.get("offline-mode", 0)
     error = None if text else "Text is required."
     if error is not None:
         flash(error)
     else:
-        db = get_db()
+        offline = bool(request.form.get("offline-mode", 0))
         try:
-            result = detect_language(text, offline_mode=bool(offline))
+            result = detect_language(text, offline_mode=offline)
         except Exception as e:
             flash(f"Problem detecting language: {e}")
         else:
-            db.execute(
-                "UPDATE entry SET text = ?, language = ?, certainty = ?, offline = ?"
-                " WHERE id = ?",
-                (text, result.language, result.certainty, offline, id),
-            )
-            db.commit()
+            entry = get_entry(id)
+            entry.text=text
+            entry.language = result.language
+            entry.certainty = result.certainty
+            entry.offline = offline
+            db.session.commit()
+
             return render_template(
                 "generator/result.html",
                 text=text,
@@ -142,14 +155,9 @@ def search():
     search_t = request.form.get("search_url")
     if search_t == "":
         return render_template("index.html", error="Please enter a search term")
-    db = get_db()
-    entries = db.execute(
-        "SELECT p.id, text, language, certainty, created, author_id, username"
-        " FROM entry p JOIN user u ON p.author_id = u.id"
-        " WHERE text like ?"
-        " ORDER BY created DESC",
-        (f"%{search_t}%",),
-    ).fetchall()
+    entries = db.session.execute(
+        select(Entry).where(Entry.text.like(f"%{search_t}%"), Entry.author_id == g.user.id)
+    ).scalars()
 
     return render_template(
         "generator/search.html", entries=entries, search_tag=search_t
@@ -159,8 +167,14 @@ def search():
 @bp.route("/<int:id>/delete", methods=("POST",))
 @login_required
 def delete(id):
-    get_entry(id)
-    db = get_db()
-    db.execute("DELETE FROM entry WHERE id = ?", (id,))
-    db.commit()
+    entry = get_entry(id)
+    db.session.delete(entry)
+    db.session.commit()
     return redirect(url_for("generator.index"))
+
+@bp.before_app_request
+def load_logged_in_user():
+    if not current_user.is_authenticated:
+        g.user = None
+    else:
+        g.user = db.session.scalars(select(User).where(User.id == current_user.id)).first()

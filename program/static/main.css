@@ -2008,6 +2008,19 @@ textarea {
     padding: 0.75em 1em;
 }
 
+label+input[type="checkbox"],
+label+input[type="radio"] {
+    text-decoration: none;
+    color: #7f888f;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1em;
+    font-weight: 400;
+    padding-left: 2.4em;
+    padding-right: 0.75em;
+    position: relative;
+}
+
 input[type="checkbox"],
 input[type="radio"] {
     -moz-appearance: none;
@@ -2448,6 +2461,7 @@ ul.pagination {
     cursor: default;
     list-style: none;
     padding-left: 0;
+    text-align: center;
 }
 
 ul.pagination li {
@@ -3712,4 +3726,9 @@ div.offline-mode {
 
 label.offline-mode {
     margin-bottom: 0px;
+}
+
+ul.flashes {
+    list-style-type: none;
+    padding-left: 0px;
 }

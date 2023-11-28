@@ -10,9 +10,12 @@ from flask import (
     session,
     url_for,
 )
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql import select
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from program.db import get_db
+from . import db
+from .models import User
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -26,7 +29,6 @@ def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        db = get_db()
         error = None
 
         try:
@@ -36,15 +38,11 @@ def register():
                 raise InputError("Password is required.")
             elif len(password) < 6:
                 raise InputError("Password must be at least 6 characters")
-
-            db.execute(
-                "INSERT INTO user (username, password) VALUES (?, ?)",
-                (username, generate_password_hash(password)),
-            )
-            db.commit()
+            db.session.add(User(username=username, password=generate_password_hash(password)))
+            db.session.commit()
         except InputError as e:
             error = str(e)
-        except db.IntegrityError:
+        except IntegrityError:
             error = f"User {username} is already registered."
         else:
             return redirect(url_for("index"))
@@ -59,22 +57,19 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        db = get_db()
-        user = db.execute(
-            "SELECT * FROM user WHERE username = ?", (username,)
-        ).fetchone()
+        user = db.session.scalars(select(User).where(User.username == username)).first()
         error = None
 
         try:
             if user is None:
                 raise InputError("Incorrect username.")
-            elif not check_password_hash(user["password"], password):
+            elif not check_password_hash(user.password, password):
                 raise InputError("Incorrect password.")
         except InputError as e:
             error = str(e)
         else:
             session.clear()
-            session["user_id"] = user["id"]
+            session["user_id"] = user.id
             return redirect(url_for("index"))
 
         flash(error)
@@ -89,9 +84,7 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = (
-            get_db().execute("SELECT * FROM user WHERE id = ?", (user_id,)).fetchone()
-        )
+        g.user = db.session.scalars(select(User).where(User.id == user_id)).first()
 
 
 @bp.route("/logout")
