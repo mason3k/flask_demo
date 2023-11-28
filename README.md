@@ -6,7 +6,20 @@
 
 # Language Detector
 
-TODO
+A simple Flask application for detecting the most likely language for a snippet of text. It can be run completely offline or alternatively, it can reference an API.
+
+Check it out: http://sujones.pythonanywhere.com/
+
+## Test User
+
+As an exercise, I implemented authentication for the site so that user's responses could be saved and retrieved. If you'd like to explore the site without registering, you can use the dummy bootstrapped user:
+
+Username: `test@me.com`
+Password: `password`
+
+## Developing
+
+To run the app locally, run:
 
 ```shell
 flask --app program run --debug
