@@ -10,7 +10,9 @@ dependencies = [
     "python-dotenv",
     "httpx",
     "SQLAlchemy",
-    "Flask-SQLAlchemy"
+    "Flask-SQLAlchemy",
+    "flask-security-too",
+    "bcrypt"
 ]
 
 

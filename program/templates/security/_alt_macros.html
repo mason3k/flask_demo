@@ -1,0 +1,14 @@
+{% macro render_field_with_errors(field) %}
+  <div class="fs-div" id="{{ field.id ~ '-sec' if field else 'fs-field' }}">
+    {% if field.type == "BooleanField" %}
+    {{ field(**kwargs)|safe }} {{ field.label }} 
+    {% else %}
+    {{ field.label }} {{ field(**kwargs)|safe }}
+    {% endif %}
+    {% if field.errors %}
+      <ul>
+        {% for error in field.errors %}<li class="fs-error-msg">{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endmacro %}

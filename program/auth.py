@@ -38,7 +38,6 @@ def register():
                 raise InputError("Password is required.")
             elif len(password) < 6:
                 raise InputError("Password must be at least 6 characters")
-
             db.session.add(User(username=username, password=generate_password_hash(password)))
             db.session.commit()
         except InputError as e:

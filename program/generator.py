@@ -2,7 +2,16 @@ import os
 from dataclasses import dataclass
 
 import httpx
-from flask import Blueprint, flash, g, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_security import auth_required, current_user
 from iso639 import Lang
 from sqlalchemy import false, select
 from werkzeug.exceptions import abort
@@ -11,8 +20,9 @@ from program.auth import login_required
 from program.config import Config
 
 # from program.db import get_db
-from . import MODEL, db
-from .models import Entry
+from . import MODEL
+from .db import db
+from .models import Entry, User
 
 KEY = os.environ["DETECTOR_API_KEY"]
 bp = Blueprint("generator", __name__)
@@ -25,7 +35,11 @@ class LangResult:
 
 
 @bp.route("/index")
+@auth_required()
 def index():
+    # db.session.add(User(email="test1@me.com", password="hi", active=True, fs_uniquifier=uuid.uuid4().hex))
+    # raise Exception(db.session.query(User).filter_by(email="test@me.com").first())
+    # raise Exception([user for user in db.session.execute(select(User)).scalars()])
     rpp = Config.ROWS_PER_PAGE
     page_num = request.args.get("page", 1, type=int)
     if g.user:
@@ -157,3 +171,10 @@ def delete(id):
     db.session.delete(entry)
     db.session.commit()
     return redirect(url_for("generator.index"))
+
+@bp.before_app_request
+def load_logged_in_user():
+    if not current_user.is_authenticated:
+        g.user = None
+    else:
+        g.user = db.session.scalars(select(User).where(User.id == current_user.id)).first()
