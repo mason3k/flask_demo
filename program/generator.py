@@ -74,36 +74,38 @@ def detect_language(text: str, offline_mode: bool = False) -> LangResult:
 @bp.route("/create", methods=("GET", "POST"))
 @login_required
 def create():
-    if request.method == "POST":
-        text = request.form["text"]
-        error = None if text else "Text is required."
-        if error is not None:
-            flash(error)
+    if request.method != "POST":
+        return render_template("generator/create.html", default_mode=Config.DEFAULT_MODE)
+    
+    text = request.form["text"].strip()
+    error = None if text else "Text is required."
+    if error is not None:
+        flash(error, category="error")
+    else:
+        offline = bool(request.form.get("offline-mode", 0))
+        try:
+            result = detect_language(text, offline_mode=offline)
+        except Exception as e:
+            flash(f"Problem detecting language: {e}", category="error")
         else:
-            offline = bool(request.form.get("offline-mode", 0))
-            try:
-                result = detect_language(text, offline_mode=offline)
-            except Exception as e:
-                flash(f"Problem detecting language: {e}")
-            else:
-                db.session.add(
-                    Entry(
-                        text=text,
-                        language=result.language,
-                        certainty=result.certainty,
-                        offline=offline,
-                        author_id=g.user.id,
-                    )
-                )
-                db.session.commit()
-
-                return render_template(
-                    "generator/result.html",
+            db.session.add(
+                Entry(
                     text=text,
                     language=result.language,
                     certainty=result.certainty,
+                    offline=offline,
+                    author_id=g.user.id,
                 )
+            )
+            db.session.commit()
 
+            return render_template(
+                "generator/result.html",
+                text=text,
+                language=result.language,
+                certainty=result.certainty,
+            )
+        
     return render_template("generator/create.html", default_mode=Config.DEFAULT_MODE)
 
 
@@ -123,16 +125,16 @@ def update(id):
     if request.method != "POST":
         return render_template("generator/update.html", entry=entry)
 
-    text = request.form["text"]
+    text = request.form["text"].strip()
     error = None if text else "Text is required."
     if error is not None:
-        flash(error)
+        flash(error, category="error")
     else:
         offline = bool(request.form.get("offline-mode", 0))
         try:
             result = detect_language(text, offline_mode=offline)
         except Exception as e:
-            flash(f"Problem detecting language: {e}")
+            flash(f"Problem detecting language: {e}", category="error")
         else:
             entry = get_entry(id)
             entry.text=text
@@ -147,6 +149,8 @@ def update(id):
                 language=result.language,
                 certainty=result.certainty,
             )
+        
+    return render_template("generator/update.html", entry=entry)
 
 
 @bp.route("/search", methods=("GET", "POST"))
