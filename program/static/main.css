@@ -3732,3 +3732,11 @@ ul.flashes {
     list-style-type: none;
     padding-left: 0px;
 }
+
+li.error {
+    color: rgb(250, 82, 82)
+}
+
+li.warning {
+    color: rgb(255, 162, 0)
+}
