@@ -62,9 +62,9 @@
 {% if not loop.last %}
 {% endif %}
 {% endfor %}
-{% if page.total > 1 %}
+{% if page.pages > 1 %}
 <ul class="pagination">
-    <li><a href="{{ url_for('generator.index', page=page.prev()) }}" class="button {{'disabled' if not page.has_prev else ''}}">Prev</a></li>
+    <li><a href="{{ url_for('generator.index', page=page.prev().page) }}" class="button {{'disabled' if not page.has_prev else ''}}">Prev</a></li>
     {% for p in page.iter_pages() %}
         {% if p %}
             <li><a href="{{ url_for('generator.index', page=p) }}" class="page {{'active' if page.page == p else ''}}">{{p}}</a></li>
@@ -72,7 +72,7 @@
             <li><span>&hellip;</span></li>
         {% endif %}
     {% endfor %}
-    <li><a href="{{ url_for('generator.index', page=page.next()) }}" class="button {{'disabled' if not page.has_next else ''}}"">Next</a></li>
+    <li><a href="{{ url_for('generator.index', page=page.next().page) }}" class="button {{'disabled' if not page.has_next else ''}}">Next</a></li>
 </ul>
 {% endif %}
 {% endif %}
