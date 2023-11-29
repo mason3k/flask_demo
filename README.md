@@ -14,7 +14,7 @@ Check it out: http://sujones.pythonanywhere.com/
 
 As an exercise, I implemented authentication for the site so that user's responses could be saved and retrieved. If you'd like to explore the site without registering, you can use the dummy bootstrapped user:
 
-Username: `test@me.com`
+Username: `test@me.com` 
 Password: `password`
 
 ## Developing
