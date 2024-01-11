@@ -10,6 +10,8 @@ A simple Flask application for detecting the most likely language for a snippet 
 
 Check it out: http://sujones.pythonanywhere.com/
 
+> :warning: **If you receive a 502 error**: Please refresh the page! It is a problem with Python Anywhere that I'm working to address.
+
 ## Test User
 
 As an exercise, I implemented authentication for the site so that user's responses could be saved and retrieved. If you'd like to explore the site without registering, you can use the dummy bootstrapped user:
