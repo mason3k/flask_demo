@@ -66,7 +66,7 @@ def detect_language(text: str, offline_mode: bool = False) -> LangResult:
         result = r.json()["data"]["detections"][0]
         language, certainty = (
             result["language"],
-            min((result["confidence"] / 10), 100),
+            min((result["confidence"] / 10), 1),
         )
     return LangResult(Lang(language).name, certainty)
 
